@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 1 Reading 2 (Part 2) Iriomote Cat - Chunk Reading</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* 英語テキストに Times New Roman を明示的に適用 */
+    .font-times {
+      font-family: 'Times New Roman', Times, Georgia, serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f8fafc] text-slate-800 font-sans antialiased">
+
+  <!-- ==========================================
+      TOP BLUE-DARK HEADER (スクリーンショットの完全再現)
+      ========================================== -->
+  <header class="bg-[#1e293b] text-white px-4 py-3 shadow-md border-b border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-50">
+    <!-- 左側タイトル領域 -->
+    <div class="flex items-center gap-3">
+      <span class="text-xl" role="img" aria-label="book">📘</span>
+      <h1 class="text-base sm:text-lg font-bold tracking-tight">
+        Unit 1 Reading 2 (Part 2) Iriomote Cat
+      </h1>
+    </div>
+
+    <!-- 右側クイックコントロール -->
+    <div class="flex items-center gap-2">
+      <!-- マイク型ボタン -->
+      <button class="p-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 rounded-full transition-colors border border-slate-700" title="音声認識機能（デモ用）">
+        <i data-lucide="mic" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Revealedカウンター -->
+      <div id="revealedCounter" class="bg-[#2563eb] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-inner tracking-wide">
+        0 / 0 Revealed
+      </div>
+
+      <!-- Show All -->
+      <button 
+        onclick="handleShowAll()"
+        class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3.5 py-1.5 rounded-lg border border-slate-700 transition-all active:scale-95"
+      >
+        Show All
+      </button>
+
+      <!-- Next Answer > -->
+      <button 
+        onclick="handleNextAnswer()"
+        class="bg-[#2563eb] hover:bg-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95"
+      >
+        <span>Next Answer</span>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 stroke-[3]"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+      SECONDARY CONTROL BAR (中央右寄せボタン群)
+      ========================================== -->
+  <div class="bg-white/95 backdrop-blur-sm border-b border-slate-200 py-2.5 px-4 sticky top-[116px] md:top-[68px] z-40">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-center md:justify-end items-center gap-2">
+      
+      <!-- Play/Stop ボタン領域 -->
+      <div id="playButtonContainer">
+        <button 
+          onclick="handlePlayAll()"
+          class="flex items-center gap-1.5 bg-[#2563eb] hover:bg-blue-600 text-white font-bold text-xs px-4 py-1.5 rounded-lg transition-all shadow-sm"
+        >
+          <span class="text-[9px]">▶</span> Play
+        </button>
+      </div>
+
+      <!-- Reset (左側) -->
+      <button 
+        onclick="handleResetAll()"
+        class="flex items-center gap-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs px-3.5 py-1.5 rounded-lg transition-all"
+      >
+        <span class="text-[10px]">■</span> Reset
+      </button>
+
+      <div class="w-px h-5 bg-slate-200 mx-1"></div>
+
+      <!-- 日本語 ON/OFF トグル -->
+      <button 
+        id="japaneseToggleBtn"
+        onclick="handleToggleJapanese()"
+        class="flex items-center gap-1 font-bold text-xs px-3.5 py-1.5 rounded-lg border transition-all bg-slate-100 border-slate-300 text-slate-800"
+      >
+        <span>文</span> 日本語: ON
+      </button>
+
+      <!-- 音声選択セレクトボックス -->
+      <select 
+        id="voiceSelect"
+        onchange="handleVoiceChange(event)"
+        class="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs text-slate-700 max-w-[120px] truncate focus:outline-none focus:ring-1 focus:ring-blue-500"
+      >
+        <option value="">音声読み込み中...</option>
+      </select>
+
+      <!-- Reset (右側回転アイコン付き) -->
+      <button 
+        onclick="handleResetAll()"
+        class="flex items-center gap-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs px-3.5 py-1.5 rounded-lg transition-all"
+        title="リセット"
+      >
+        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+        <span>Reset</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+      MAIN CONTENT TABLE (スクリーンショット完全再現)
+      ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <table class="w-full border-collapse text-left">
+        
+        <!-- テーブルヘッダー -->
+        <thead>
+          <tr class="bg-[#f8fafc] border-b border-slate-200 select-none">
+            <th class="w-[62%] px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-r border-slate-200">
+              English Text
+            </th>
+            <th class="w-[38%] px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+              Japanese Meaning
+            </th>
+          </tr>
+        </thead>
+
+        <!-- テーブルボディ -->
+        <tbody id="tableBody" class="divide-y divide-slate-150">
+          <!-- JSで動的に描画されます -->
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- お祝いポップアップ (全開示完了時) -->
+    <div id="congratsModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-slate-200">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check" class="w-10 h-10 stroke-[3]"></i>
+        </div>
+        <h3 class="text-2xl font-black text-slate-800">Perfect Score!</h3>
+        <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+          おめでとうございます！<br />
+          Part 2 (外見と習性・繁殖) のすべての空欄を開示できました！
+        </p>
+        <div class="mt-6 flex flex-col gap-2">
+          <button 
+            onclick="handleResetAll()"
+            class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-colors"
+          >
+            もう一度挑戦
+          </button>
+          <button 
+            onclick="closeCongratsModal()"
+            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors shadow-md shadow-blue-100"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 原田先生への学習アシスタント・ガイド -->
+    <div class="mt-8 bg-slate-100 border border-slate-200 rounded-xl p-5 text-xs text-slate-500 leading-relaxed max-w-4xl mx-auto">
+      <p class="font-bold text-slate-700 text-sm mb-1.5">🎓 授業でのおすすめの活用法</p>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>ターゲットセンテンスの指導:</strong> 英語が非表示またはカッコ <code>(  )</code> で隠れている状態で、日本語の意味を手がかりに、生徒に重要構文を一文まるごと推測させ、テンポよく開示していきます。</li>
+        <li><strong>シャドーイング:</strong> 「<code>▶ Play</code>」を押すことで、現在発音している行が薄イエローにハイライトされながら流れるため、目と耳の両方を使ってテンポよく音読トレーニングができます。</li>
+        <li><strong>個人端末（Chromebook）での自習:</strong> 英語が得意な生徒は日本語表示を「OFF」にし、ターゲットフレーズがすべて隠れた状態から「自力でフルセンテンスを書き出せるか（言えるか）」に挑戦できます。</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- ==========================================
+      CORE JAVASCRIPT LOGIC
+      ========================================== -->
+  <script>
+    // データ定義
+    const TABLE_ROWS = [
+      {
+        id: 1,
+        paragraph: 3,
+        englishWords: [
+          { text: "Iriomote", isBlank: false },
+          { text: "cats", isBlank: false },
+          { text: "are", isBlank: false },
+          { text: "similar", isBlank: true, id: "w1", hint: "s" }
+        ],
+        japanese: "イリオモテヤマネコは似ている",
+        fullText: "Iriomote cats are similar"
+      },
+      {
+        id: 2,
+        paragraph: 3,
+        englishWords: [
+          { text: "in", isBlank: false },
+          { text: "size", isBlank: false },
+          { text: "and", isBlank: false },
+          { text: "appearance", isBlank: false }
+        ],
+        japanese: "大きさや外見において",
+        fullText: "in size and appearance"
+      },
+      {
+        id: 3,
+        paragraph: 3,
+        englishWords: [
+          { text: "to", isBlank: true, id: "w2", hint: "" },
+          { text: "domestic", isBlank: false },
+          { text: "cats,", isBlank: false }
+        ],
+        japanese: "家猫と，",
+        fullText: "to domestic cats,"
+      },
+      {
+        id: 4,
+        paragraph: 3,
+        englishWords: [
+          { text: "although", isBlank: false },
+          { text: "they", isBlank: false },
+          { text: "have", isBlank: false },
+          { text: "some", isBlank: false },
+          { text: "distinctive", isBlank: true, id: "w3", hint: "dis" },
+          { text: "features.", isBlank: true, id: "w4", hint: "f" }
+        ],
+        japanese: "かれらはいくつかの独特な特徴があるけれども。",
+        fullText: "although they have some distinctive features."
+      },
+      {
+        id: 5,
+        paragraph: 3,
+        englishWords: [
+          { text: "They", isBlank: false },
+          { text: "have", isBlank: false },
+          { text: "round", isBlank: false },
+          { text: "ears", isBlank: false }
+        ],
+        japanese: "かれらは丸い耳をしていて",
+        fullText: "They have round ears"
+      },
+      {
+        id: 6,
+        paragraph: 3,
+        englishWords: [
+          { text: "with", isBlank: false },
+          { text: "white", isBlank: false },
+          { text: "dots", isBlank: true, id: "w5", hint: "d" },
+          { text: "behind", isBlank: false },
+          { text: "them", isBlank: false }
+        ],
+        japanese: "それらの後ろに白い斑点がある",
+        fullText: "with white dots behind them"
+      },
+      {
+        id: 7,
+        paragraph: 3,
+        englishWords: [
+          { text: "and", isBlank: false },
+          { text: "a", isBlank: false },
+          { text: "large,", isBlank: false },
+          { text: "flat", isBlank: true, id: "w6", hint: "f" },
+          { text: "nose.", isBlank: false }
+        ],
+        japanese: "そして大きくて，平たい鼻（がある）。",
+        fullText: "and a large, flat nose."
+      },
+      {
+        id: 8,
+        paragraph: 3,
+        englishWords: [
+          { text: "Their", isBlank: false },
+          { text: "eyes", isBlank: false },
+          { text: "are", isBlank: false },
+          { text: "surrounded", isBlank: true, id: "w7", hint: "s" },
+          { text: "by", isBlank: false },
+          { text: "white", isBlank: false },
+          { text: "fur", isBlank: false }
+        ],
+        japanese: "かれらの目は白い毛で囲まれている",
+        fullText: "Their eyes are surrounded by white fur"
+      },
+      {
+        id: 9,
+        paragraph: 3,
+        englishWords: [
+          { text: "and", isBlank: false },
+          { text: "their", isBlank: false },
+          { text: "tails", isBlank: true, id: "w8", hint: "t" },
+          { text: "are", isBlank: false },
+          { text: "short", isBlank: false },
+          { text: "and", isBlank: false },
+          { text: "fat.", isBlank: false }
+        ],
+        japanese: "そしてかれらのしっぽは短くて太い。",
+        fullText: "and their tails are short and fat."
+      },
+      {
+        id: 10,
+        paragraph: 4,
+        englishWords: [
+          { text: "Iriomote", isBlank: false },
+          { text: "cats", isBlank: false },
+          { text: "are", isBlank: false },
+          { text: "most", isBlank: false },
+          { text: "active", isBlank: true, id: "w9", hint: "a" },
+          { text: "at", isBlank: false },
+          { text: "night,", isBlank: false }
+        ],
+        japanese: "イリオモテヤマネコは夜間最も活発になる",
+        fullText: "Iriomote cats are most active at night,"
+      },
+      {
+        id: 11,
+        paragraph: 4,
+        englishWords: [
+          { text: "especially", isBlank: false },
+          { text: "at", isBlank: false },
+          { text: "sunrise", isBlank: true, id: "w10", hint: "s" },
+          { text: "and", isBlank: false },
+          { text: "sunset.", isBlank: true, id: "w11", hint: "s" }
+        ],
+        japanese: "特に日の出と日の入りに。",
+        fullText: "especially at sunrise and sunset."
+      },
+      {
+        id: 12,
+        paragraph: 4,
+        englishWords: [
+          { text: "They", isBlank: false },
+          { text: "are", isBlank: false },
+          { text: "territorial", isBlank: false },
+          { text: "animals", isBlank: false }
+        ],
+        japanese: "かれらは縄張り意識の強い動物である",
+        fullText: "They are territorial animals"
+      },
+      {
+        id: 13,
+        paragraph: 4,
+        englishWords: [
+          { text: "and", isBlank: false },
+          { text: "live", isBlank: false },
+          { text: "alone.", isBlank: false }
+        ],
+        japanese: "そして単独で生活する。",
+        fullText: "and live alone."
+      },
+      {
+        id: 14,
+        paragraph: 4,
+        englishWords: [
+          { text: "The", isBlank: false },
+          { text: "territory", isBlank: false },
+          { text: "for", isBlank: false },
+          { text: "females", isBlank: true, id: "w12", hint: "f" }
+        ],
+        japanese: "メスにとってその縄張りは",
+        fullText: "The territory for females"
+      },
+      {
+        id: 15,
+        paragraph: 4,
+        englishWords: [
+          { text: "ranges", isBlank: true, id: "w13", hint: "ra" },
+          { text: "from", isBlank: false },
+          { text: "1-3", isBlank: false },
+          { text: "square", isBlank: false },
+          { text: "km", isBlank: false }
+        ],
+        japanese: "1から3平方キロメートルまでの範囲におよび，",
+        fullText: "ranges from 1-3 square km"
+      },
+      {
+        id: 16,
+        paragraph: 4,
+        englishWords: [
+          { text: "and", isBlank: false },
+          { text: "this", isBlank: false },
+          { text: "increases", isBlank: false },
+          { text: "to", isBlank: false },
+          { text: "2-7", isBlank: false },
+          { text: "square", isBlank: false },
+          { text: "km", isBlank: false }
+        ],
+        japanese: "そしてこれは2-7平方キロメートルに広がる",
+        fullText: "and this increases to 2-7 square km"
+      },
+      {
+        id: 17,
+        paragraph: 4,
+        englishWords: [
+          { text: "for", isBlank: false },
+          { text: "males.", isBlank: true, id: "w14", hint: "m" }
+        ],
+        japanese: "オスにとっては。",
+        fullText: "for males."
+      },
+      {
+        id: 18,
+        paragraph: 5,
+        englishWords: [
+          { text: "Mating", isBlank: false },
+          { text: "season", isBlank: false },
+          { text: "peaks", isBlank: false }
+        ],
+        japanese: "交尾期はピークを迎える",
+        fullText: "Mating season peaks"
+      },
+      {
+        id: 19,
+        paragraph: 5,
+        englishWords: [
+          { text: "between", isBlank: false },
+          { text: "February", isBlank: false },
+          { text: "and", isBlank: false },
+          { text: "April,", isBlank: false }
+        ],
+        japanese: "2月から4月の間に，",
+        fullText: "between February and April,"
+      },
+      {
+        id: 20,
+        paragraph: 5,
+        englishWords: [
+          { text: "with", isBlank: true, id: "w15", hint: "" },
+          { text: "most", isBlank: false },
+          { text: "births", isBlank: false },
+          { text: "happening", isBlank: false }
+        ],
+        japanese: "ほとんどの出産は起きている",
+        fullText: "with most births happening"
+      },
+      {
+        id: 21,
+        paragraph: 5,
+        englishWords: [
+          { text: "between", isBlank: false },
+          { text: "April", isBlank: false },
+          { text: "and", isBlank: false },
+          { text: "June.", isBlank: false }
+        ],
+        japanese: "4月から6月の間に。",
+        fullText: "between April and June."
+      },
+      {
+        id: 22,
+        paragraph: 5,
+        englishWords: [
+          { text: "Females", isBlank: true, id: "w16_1", hint: "" },
+          { text: "generally", isBlank: true, id: "w16_2", hint: "" },
+          { text: "produce", isBlank: true, id: "w16_3", hint: "" },
+          { text: "only", isBlank: true, id: "w16_4", hint: "" },
+          { text: "one", isBlank: true, id: "w16_5", hint: "" },
+          { text: "or", isBlank: true, id: "w16_6", hint: "" },
+          { text: "two", isBlank: true, id: "w16_7", hint: "" },
+          { text: "kittens,", isBlank: true, id: "w16_8", hint: "" }
+        ],
+        japanese: "メスは一般に1あるいは2頭のみ子猫を産み，",
+        fullText: "Females generally produce only one or two kittens,"
+      },
+      {
+        id: 23,
+        paragraph: 5,
+        englishWords: [
+          { text: "which", isBlank: true, id: "w17_1", hint: "" },
+          { text: "grow", isBlank: true, id: "w17_2", hint: "" },
+          { text: "quickly", isBlank: true, id: "w17_3", hint: "" }
+        ],
+        japanese: "そしてその子猫はすぐに成長して",
+        fullText: "which grow quickly"
+      },
+      {
+        id: 24,
+        paragraph: 5,
+        englishWords: [
+          { text: "and", isBlank: true, id: "w18_1", hint: "" },
+          { text: "are", isBlank: true, id: "w18_2", hint: "" },
+          { text: "usually", isBlank: true, id: "w18_3", hint: "" },
+          { text: "independent", isBlank: true, id: "w18_4", hint: "" },
+          { text: "by", isBlank: true, id: "w18_5", hint: "" },
+          { text: "winter.", isBlank: true, id: "w18_6", hint: "" }
+        ],
+        japanese: "そして通常冬までには自立している。",
+        fullText: "and are usually independent by winter."
+      },
+      {
+        id: 25,
+        paragraph: 6,
+        englishWords: [
+          { text: "Iriomote", isBlank: false },
+          { text: "cats", isBlank: false },
+          { text: "are", isBlank: false },
+          { text: "critically", isBlank: true, id: "w19", hint: "crit" },
+          { text: "endangered", isBlank: false }
+        ],
+        japanese: "イリオモテヤマネコは深刻な危機に瀕している",
+        fullText: "Iriomote cats are critically endangered"
+      },
+      {
+        id: 26,
+        paragraph: 6,
+        englishWords: [
+          { text: "and", isBlank: false },
+          { text: "face", isBlank: true, id: "w20", hint: "f" },
+          { text: "an", isBlank: false },
+          { text: "extremely", isBlank: false },
+          { text: "high", isBlank: false },
+          { text: "risk", isBlank: false },
+          { text: "of", isBlank: false },
+          { text: "extinction", isBlank: true, id: "w21", hint: "ex" }
+        ],
+        japanese: "そして極めて高い絶滅のリスクに直面している",
+        fullText: "and face an extremely high risk of extinction"
+      },
+      {
+        id: 27,
+        paragraph: 6,
+        englishWords: [
+          { text: "in", isBlank: false },
+          { text: "the", isBlank: false },
+          { text: "wild", isBlank: true, id: "w22", hint: "w" }
+        ],
+        japanese: "野生では",
+        fullText: "in the wild"
+      },
+      {
+        id: 28,
+        paragraph: 6,
+        englishWords: [
+          { text: "in", isBlank: false },
+          { text: "the", isBlank: false },
+          { text: "near", isBlank: false },
+          { text: "future.", isBlank: false }
+        ],
+        japanese: "近い将来。",
+        fullText: "in the near future."
+      }
+    ];
+
+    // 空欄のみを抽出
+    const ALL_BLANKS = TABLE_ROWS.flatMap(row => row.englishWords.filter(w => w.isBlank));
+
+    // アプリケーションの状態
+    const state = {
+      revealedIds: new Set(),
+      showJapanese: true,
+      isPlayingAll: false,
+      activeRowId: null,
+      voices: [],
+      selectedVoice: null
+    };
+
+    let playTimeout = null;
+
+    // 音声読み上げリストのセットアップ
+    function initVoices() {
+      if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices();
+        const enVoices = voices.filter(v => v.lang.startsWith('en'));
+        state.voices = enVoices.length > 0 ? enVoices : voices;
+        
+        const voiceSelect = document.getElementById('voiceSelect');
+        if (voiceSelect && state.voices.length > 0) {
+          voiceSelect.innerHTML = '';
+          state.voices.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.name;
+            opt.textContent = v.name.replace("Google", "").trim();
+            voiceSelect.appendChild(opt);
+          });
+
+          // デフォルトの設定
+          const defaultVoice = state.voices.find(v => v.name.includes('Google') || v.name.includes('Natural')) || state.voices[0];
+          state.selectedVoice = defaultVoice;
+          voiceSelect.value = defaultVoice.name;
+        }
+      }
+    }
+
+    // 音声選択の変更ハンドラ
+    function handleVoiceChange(event) {
+      const selectedName = event.target.value;
+      state.selectedVoice = state.voices.find(v => v.name === selectedName) || null;
+    }
+
+    // 音声リストの初期化ハンドラ
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = initVoices;
+      initVoices();
+    }
+
+    // テーブルのレンダリング
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      TABLE_ROWS.forEach(row => {
+        const isCurrentPlaying = state.activeRowId === row.id;
+        const trClass = isCurrentPlaying ? 'bg-yellow-100/80 transition-colors duration-150 active-row' : 'hover:bg-slate-50/50';
+
+        const tr = document.createElement('tr');
+        tr.className = trClass;
+        tr.id = `row-${row.id}`;
+
+        // 英語テキストのワード構築
+        let englishHTML = '';
+        row.englishWords.forEach(word => {
+          if (word.isBlank) {
+            const isRevealed = state.revealedIds.has(word.id);
+            const btnClass = isRevealed 
+              ? 'bg-blue-50 border-blue-200 text-blue-700 font-bold scale-102' 
+              : 'bg-[#f1f5f9] border-[#e2e8f0] hover:bg-[#e2e8f0] text-[#94a3b8]';
+            
+            const hintText = word.hint || "";
+            const spacesCount = Math.max(1, Math.floor(word.text.length * 0.8));
+            const content = isRevealed ? word.text : ` (${hintText}${"　".repeat(spacesCount)}) `;
+            
+            englishHTML += `
+              <button
+                onclick="handleWordClick('${word.id}')"
+                class="inline-flex items-center justify-center px-4 py-1.5 mx-0.5 rounded-xl text-xl sm:text-2xl font-extrabold transition-all duration-150 shadow-sm border font-times ${btnClass}"
+                title="${isRevealed ? 'クリックして隠す' : 'クリックして開く'}"
+              >
+                ${content}
+              </button>
+            `;
+          } else {
+            englishHTML += `<span class="inline text-slate-800 select-all">${word.text}</span> `;
+          }
+        });
+
+        // 日本語カラムの作成
+        const japaneseHTML = state.showJapanese 
+          ? `<p class="text-lg sm:text-xl font-bold text-slate-700 leading-relaxed select-all">${row.japanese}</p>`
+          : `<span class="text-slate-300 text-sm italic select-none">日本語非表示</span>`;
+
+        // 🔊スピーカボタンのクラス
+        const speakerBtnClass = isCurrentPlaying 
+          ? 'bg-amber-400 border-amber-400 text-white' 
+          : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-500';
+
+        tr.innerHTML = `
+          <!-- 左カラム: 英語コンテンツ -->
+          <td class="px-6 py-6 border-r border-slate-200 align-middle">
+            <div class="flex items-center gap-4 justify-between">
+              
+              <div class="flex items-start gap-4 flex-1">
+                <!-- 連番 [番号] -->
+                <span class="inline-flex items-center justify-center w-7 h-7 border border-slate-300 rounded text-xs font-bold text-slate-500 bg-white select-none shrink-0 mt-1">
+                  ${row.id}
+                </span>
+
+                <!-- 英語テキスト (Times New Roman & 巨大フォント) -->
+                <div class="flex-1 text-2xl sm:text-3xl font-bold text-[#1e293b] tracking-wide leading-relaxed flex flex-wrap items-center gap-x-2 gap-y-3 font-times">
+                  ${englishHTML}
+                </div>
+              </div>
+
+              <!-- 個別スピーカー再生ボタン -->
+              <button 
+                onclick="playSingleRow(${row.id})"
+                class="p-2.5 rounded-full border shadow-xs transition-all shrink-0 ${speakerBtnClass}"
+                title="この行を読み上げる"
+              >
+                <i data-lucide="volume-2" class="w-5 h-5"></i>
+              </button>
+
+            </div>
+          </td>
+
+          <!-- 右カラム: 日本語意味 -->
+          <td class="px-6 py-6 align-middle">
+            ${japaneseHTML}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Lucideアイコンの再適用
+      lucide.createIcons();
+
+      // カウンター表示の同期
+      document.getElementById('revealedCounter').innerText = `${state.revealedIds.size} / ${ALL_BLANKS.length} Revealed`;
+
+      // 全問正解チェック
+      if (state.revealedIds.size === ALL_BLANKS.length && ALL_BLANKS.length > 0) {
+        document.getElementById('congratsModal').classList.remove('hidden');
+      } else {
+        document.getElementById('congratsModal').classList.add('hidden');
+      }
+
+      // 自動スクロール機能の追加
+      if (state.activeRowId !== null) {
+        const activeRow = document.getElementById(`row-${state.activeRowId}`);
+        if (activeRow) {
+          activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
+    // 1単語の開示トグル
+    window.handleWordClick = function(wordId) {
+      if (state.revealedIds.has(wordId)) {
+        state.revealedIds.delete(wordId);
+      } else {
+        state.revealedIds.add(wordId);
+      }
+      renderTable();
+    };
+
+    // すべて開示
+    window.handleShowAll = function() {
+      ALL_BLANKS.forEach(w => state.revealedIds.add(w.id));
+      renderTable();
+    };
+
+    // 次の1つを開示
+    window.handleNextAnswer = function() {
+      const nextBlank = ALL_BLANKS.find(w => !state.revealedIds.has(w.id));
+      if (nextBlank) {
+        state.revealedIds.add(nextBlank.id);
+        renderTable();
+      }
+    };
+
+    // リセット
+    window.handleResetAll = function() {
+      state.revealedIds.clear();
+      handleStopSpeech();
+      renderTable();
+    };
+
+    // 日本語表示トグル
+    window.handleToggleJapanese = function() {
+      state.showJapanese = !state.showJapanese;
+      const btn = document.getElementById('japaneseToggleBtn');
+      if (state.showJapanese) {
+        btn.innerHTML = '<span>文</span> 日本語: ON';
+        btn.className = 'flex items-center gap-1 font-bold text-xs px-3.5 py-1.5 rounded-lg border transition-all bg-slate-100 border-slate-300 text-slate-800';
+      } else {
+        btn.innerHTML = '<span>文</span> 日本語: OFF';
+        btn.className = 'flex items-center gap-1 font-bold text-xs px-3.5 py-1.5 rounded-lg border transition-all bg-slate-50 border-slate-200 text-slate-400';
+      }
+      renderTable();
+    };
+
+    // モーダルを閉じる
+    window.closeCongratsModal = function() {
+      document.getElementById('congratsModal').classList.add('hidden');
+    };
+
+    // 1行読み上げ
+    window.playSingleRow = function(rowId) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      handleStopSpeech();
+
+      const row = TABLE_ROWS.find(r => r.id === rowId);
+      if (!row) return;
+
+      const utterance = new SpeechSynthesisUtterance(row.fullText);
+      utterance.lang = 'en-US';
+      if (state.selectedVoice) {
+        utterance.voice = state.selectedVoice;
+      }
+      utterance.rate = 1.0;
+
+      utterance.onstart = () => {
+        state.activeRowId = rowId;
+        renderTable();
+      };
+      utterance.onend = () => {
+        state.activeRowId = null;
+        renderTable();
+      };
+      utterance.onerror = () => {
+        state.activeRowId = null;
+        renderTable();
+      };
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    // 連続再生
+    window.handlePlayAll = function() {
+      if (!('speechSynthesis' in window)) return;
+      state.isPlayingAll = true;
+      updatePlayButtonUI(true);
+
+      let currentIndex = 0;
+
+      function playNext() {
+        if (currentIndex >= TABLE_ROWS.length || !state.isPlayingAll) {
+          state.isPlayingAll = false;
+          state.activeRowId = null;
+          updatePlayButtonUI(false);
+          renderTable();
+          return;
+        }
+
+        const row = TABLE_ROWS[currentIndex];
+        state.activeRowId = row.id;
+        renderTable();
+
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(row.fullText);
+        utterance.lang = 'en-US';
+        if (state.selectedVoice) {
+          utterance.voice = state.selectedVoice;
+        }
+        utterance.rate = 1.0;
+
+        utterance.onend = () => {
+          playTimeout = setTimeout(() => {
+            currentIndex++;
+            playNext();
+          }, 600);
+        };
+
+        utterance.onerror = () => {
+          state.isPlayingAll = false;
+          state.activeRowId = null;
+          updatePlayButtonUI(false);
+          renderTable();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      playNext();
+    };
+
+    // 音声停止
+    window.handleStopSpeech = function() {
+      state.isPlayingAll = false;
+      state.activeRowId = null;
+      updatePlayButtonUI(false);
+      if (playTimeout) clearTimeout(playTimeout);
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      renderTable();
+    };
+
+    // 再生ボタンのUI切替
+    function updatePlayButtonUI(playing) {
+      const container = document.getElementById('playButtonContainer');
+      if (playing) {
+        container.innerHTML = `
+          <button 
+            onclick="handleStopSpeech()"
+            class="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition-all shadow-sm animate-pulse"
+          >
+            <span class="text-[9px]">■</span> Stop
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button 
+            onclick="handlePlayAll()"
+            class="flex items-center gap-1.5 bg-[#2563eb] hover:bg-blue-600 text-white font-bold text-xs px-4 py-1.5 rounded-lg transition-all shadow-sm"
+          >
+            <span class="text-[9px]">▶</span> Play
+          </button>
+        `;
+      }
+    }
+
+    // 初回読み込み時のレンダリング
+    window.onload = () => {
+      initVoices();
+      renderTable();
+    };
+  </script>
+</body>
+</html>
