@@ -319,6 +319,7 @@
             {
                 id: "9",
                 noNumber: false,
+                japanese: "しっぽは短くて太い。",
                 japanese: "そしてかれらのしっぽは短くて太い。",
                 fullSentence: "and their tails are short and fat.",
                 parts: [
@@ -372,6 +373,7 @@
             {
                 id: "13",
                 noNumber: false,
+                japanese: "単独で生活する。",
                 japanese: "そして単独で生活する。",
                 fullSentence: "and live alone.",
                 parts: [
@@ -401,7 +403,7 @@
             {
                 id: "16",
                 noNumber: false,
-                japanese: "精度よく2-7平方キロメートルに広がる",
+                japanese: "2-7平方キロメートルに広がる",
                 japanese: "そしてこれは2-7平方キロメートルに広がる",
                 fullSentence: "and this increases to 2-7 square km",
                 parts: [
@@ -530,7 +532,7 @@
             {
                 id: "26",
                 noNumber: false,
-                japanese: "精度よく極めて高い絶滅のリスクに直面している",
+                japanese: "極めて高い絶滅のリスクに直面している",
                 japanese: "そして極めて高い絶滅のリスクに直面している",
                 fullSentence: "and face an extremely high risk of extinction",
                 parts: [
@@ -573,7 +575,8 @@
             revealedIds: new Set(),
             voices: [],
             selectedVoice: null,
-            speechRate: 1.0
+            speechRate: 1.0,
+            currentUtterance: null
         };
 
         // 音声読み上げリストのセットアップ
@@ -601,7 +604,7 @@
             }
         }
 
-        // 音声選択の変更ハンドラ
+        // 音声選択 of 変更ハンドラ
         window.handleVoiceChange = function(event) {
             const selectedName = event.target.value;
             state.selectedVoice = state.voices.find(v => v.name === selectedName) || null;
@@ -857,6 +860,7 @@
 
         // Text-to-speech for single sentence
         function speakSentence(text, btnElement, rowIndex) {
+            state.currentUtterance = null; // ガードをクリア
             if (speechSynth.speaking) {
                 speechSynth.cancel();
             }
@@ -887,13 +891,28 @@
                 utterance.voice = state.selectedVoice;
             }
             utterance.rate = state.speechRate;
+            state.currentUtterance = utterance;
 
             utterance.onend = () => {
-                btnElement.className = "w-8.5 h-8.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition shrink-0 select-none self-center mt-1";
-                btnElement.innerHTML = `<i data-lucide="volume-2" class="w-4.5 h-4.5"></i>`;
-                lucide.createIcons();
-                activeSpeakerButton = null;
-                activeSpeakerRowIndex = null;
+                if (state.currentUtterance === utterance) {
+                    state.currentUtterance = null;
+                    btnElement.className = "w-8.5 h-8.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition shrink-0 select-none self-center mt-1";
+                    btnElement.innerHTML = `<i data-lucide="volume-2" class="w-4.5 h-4.5"></i>`;
+                    lucide.createIcons();
+                    activeSpeakerButton = null;
+                    activeSpeakerRowIndex = null;
+                }
+            };
+
+            utterance.onerror = () => {
+                if (state.currentUtterance === utterance) {
+                    state.currentUtterance = null;
+                    btnElement.className = "w-8.5 h-8.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition shrink-0 select-none self-center mt-1";
+                    btnElement.innerHTML = `<i data-lucide="volume-2" class="w-4.5 h-4.5"></i>`;
+                    lucide.createIcons();
+                    activeSpeakerButton = null;
+                    activeSpeakerRowIndex = null;
+                }
             };
 
             speechSynth.speak(utterance);
@@ -903,6 +922,7 @@
         function toggleGlobalSpeech() {
             if (isSpeakingPlaylist) {
                 // 現在再生中の場合：一時停止 (Pause)
+                state.currentUtterance = null; // 非同期イベントをガード
                 speechSynth.cancel();
                 isSpeakingPlaylist = false;
                 isPausedPlaylist = true;
@@ -942,12 +962,21 @@
                 utterance.voice = state.selectedVoice;
             }
             utterance.rate = state.speechRate;
+            state.currentUtterance = utterance;
 
             utterance.onend = () => {
-                if (isSpeakingPlaylist) {
+                if (state.currentUtterance === utterance) {
+                    state.currentUtterance = null;
                     targetRow.classList.remove('bg-blue-50/70');
                     activeSpeechIndex++;
                     playNextPlaylistSentence();
+                }
+            };
+
+            utterance.onerror = () => {
+                if (state.currentUtterance === utterance) {
+                    state.currentUtterance = null;
+                    stopAllSpeech();
                 }
             };
 
@@ -956,6 +985,7 @@
 
         // Stop all speech (Reset)
         function stopAllSpeech() {
+            state.currentUtterance = null; // ガードをクリア
             speechSynth.cancel();
             isSpeakingPlaylist = false;
             isPausedPlaylist = false;
