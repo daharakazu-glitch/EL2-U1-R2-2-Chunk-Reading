@@ -578,7 +578,9 @@
             speechRate: 1.0,
             currentUtterance: null,
             currentTextOffset: 0,
-            lastBoundaryIndex: 0
+            lastBoundaryIndex: 0,
+            sentenceStartTime: 0,
+            isBoundaryTriggered: false
         };
 
         // 音声読み上げリストのセットアップ
@@ -926,8 +928,37 @@
                 // 現在再生中の場合：一時停止 (Pause)
                 state.currentUtterance = null; // 非同期イベントをガード
                 
-                // 一時停止するまでに読み上げた単語の境界位置をオフセットに加算
-                state.currentTextOffset += state.lastBoundaryIndex;
+                const currentObj = chunkData[activeSpeechIndex];
+                const fullSentenceText = currentObj.fullSentence;
+                const speechText = fullSentenceText.substring(state.currentTextOffset);
+                
+                let addedOffset = 0;
+                if (state.isBoundaryTriggered) {
+                    // onboundary が機能している場合
+                    addedOffset = state.lastBoundaryIndex;
+                } else {
+                    // onboundary が機能していない場合（Safari等）はタイムスタンプから近似計算
+                    const elapsed = Date.now() - state.sentenceStartTime;
+                    // 1.0倍速のとき1文字あたり約70msと仮定（140 WPM, 1語平均6文字）
+                    const msPerChar = 70 / state.speechRate;
+                    let estimatedIndex = Math.floor(elapsed / msPerChar);
+                    
+                    // 文の長さを超えないように制限
+                    estimatedIndex = Math.min(estimatedIndex, speechText.length);
+                    
+                    // 単語の区切り（スペース）に調整する（より自然な再開のため）
+                    let bestSpaceIndex = estimatedIndex;
+                    while (bestSpaceIndex > 0 && speechText[bestSpaceIndex] !== ' ') {
+                        bestSpaceIndex--;
+                    }
+                    if (bestSpaceIndex > 0 && (estimatedIndex - bestSpaceIndex) < 15) {
+                        addedOffset = bestSpaceIndex + 1; // スペースの次の文字から
+                    } else {
+                        addedOffset = estimatedIndex;
+                    }
+                }
+
+                state.currentTextOffset += addedOffset;
 
                 speechSynth.cancel();
                 isSpeakingPlaylist = false;
@@ -979,10 +1010,15 @@
             utterance.rate = state.speechRate;
             state.currentUtterance = utterance;
 
+            state.sentenceStartTime = Date.now();
+            state.isBoundaryTriggered = false;
+            state.lastBoundaryIndex = 0;
+
             // 音声の単語境界（boundary）が更新されるたびにインデックスを記録
             utterance.onboundary = (event) => {
                 if (event.name === 'word') {
                     state.lastBoundaryIndex = event.charIndex;
+                    state.isBoundaryTriggered = true;
                 }
             };
 
@@ -993,6 +1029,7 @@
                     activeSpeechIndex++;
                     state.currentTextOffset = 0; // 次のセンテンスは最初から
                     state.lastBoundaryIndex = 0;
+                    state.isBoundaryTriggered = false;
                     playNextPlaylistSentence();
                 }
             };
@@ -1016,6 +1053,8 @@
             activeSpeechIndex = 0;
             state.currentTextOffset = 0;
             state.lastBoundaryIndex = 0;
+            state.sentenceStartTime = 0;
+            state.isBoundaryTriggered = false;
             updateGlobalPlayButton();
 
             // Reset highlighted rows
