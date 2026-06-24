@@ -576,7 +576,9 @@
             voices: [],
             selectedVoice: null,
             speechRate: 1.0,
-            currentUtterance: null
+            currentUtterance: null,
+            currentTextOffset: 0,
+            lastBoundaryIndex: 0
         };
 
         // 音声読み上げリストのセットアップ
@@ -923,6 +925,10 @@
             if (isSpeakingPlaylist) {
                 // 現在再生中の場合：一時停止 (Pause)
                 state.currentUtterance = null; // 非同期イベントをガード
+                
+                // 一時停止するまでに読み上げた単語の境界位置をオフセットに加算
+                state.currentTextOffset += state.lastBoundaryIndex;
+
                 speechSynth.cancel();
                 isSpeakingPlaylist = false;
                 isPausedPlaylist = true;
@@ -933,10 +939,12 @@
             // 再生を開始または再開
             isSpeakingPlaylist = true;
             if (!isPausedPlaylist) {
-                activeSpeechIndex = 0; // 新規再生
+                activeSpeechIndex = 0;
+                state.currentTextOffset = 0;
             }
             isPausedPlaylist = false;
             updateGlobalPlayButton();
+            state.lastBoundaryIndex = 0;
             playNextPlaylistSentence();
         }
 
@@ -956,7 +964,14 @@
                 targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            const utterance = new SpeechSynthesisUtterance(currentObj.fullSentence);
+            // オフセット位置からの切り出し
+            const fullSentenceText = currentObj.fullSentence;
+            if (state.currentTextOffset >= fullSentenceText.length) {
+                state.currentTextOffset = 0;
+            }
+            const speechText = fullSentenceText.substring(state.currentTextOffset);
+
+            const utterance = new SpeechSynthesisUtterance(speechText);
             utterance.lang = 'en-US';
             if (state.selectedVoice) {
                 utterance.voice = state.selectedVoice;
@@ -964,11 +979,20 @@
             utterance.rate = state.speechRate;
             state.currentUtterance = utterance;
 
+            // 音声の単語境界（boundary）が更新されるたびにインデックスを記録
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    state.lastBoundaryIndex = event.charIndex;
+                }
+            };
+
             utterance.onend = () => {
                 if (state.currentUtterance === utterance) {
                     state.currentUtterance = null;
                     targetRow.classList.remove('bg-blue-50/70');
                     activeSpeechIndex++;
+                    state.currentTextOffset = 0; // 次のセンテンスは最初から
+                    state.lastBoundaryIndex = 0;
                     playNextPlaylistSentence();
                 }
             };
@@ -990,6 +1014,8 @@
             isSpeakingPlaylist = false;
             isPausedPlaylist = false;
             activeSpeechIndex = 0;
+            state.currentTextOffset = 0;
+            state.lastBoundaryIndex = 0;
             updateGlobalPlayButton();
 
             // Reset highlighted rows
